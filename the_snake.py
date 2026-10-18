@@ -30,11 +30,11 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 pygame.display.set_caption('Змейка')
 clock = pygame.time.Clock()
 
-
 class GameObject:
     """Базовый класс игрового объекта."""
 
     def __init__(self, position=None, body_color=None):
+        """Создать игровой объект."""
         self.position = position or (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
@@ -47,11 +47,11 @@ class GameObject:
         pygame.draw.rect(screen, self.body_color, rect)
         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
-
 class Apple(GameObject):
     """Яблоко, которое увеличивает длину змейки."""
 
     def __init__(self):
+        """Создать яблоко."""
         super().__init__(body_color=APPLE_COLOR)
         self.randomize_position()
 
@@ -66,11 +66,11 @@ class Apple(GameObject):
         """Отрисовать яблоко."""
         super().draw()
 
-
 class Snake(GameObject):
     """Змейка, управляемая стрелками клавиатуры."""
 
     def __init__(self):
+        """Создать змейку."""
         super().__init__(
             position=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2),
             body_color=SNAKE_COLOR,
@@ -100,6 +100,7 @@ class Snake(GameObject):
 
         self.positions.insert(0, new_head)
         self.position = new_head
+
         if len(self.positions) > self.length:
             self.last = self.positions.pop()
         else:
@@ -133,11 +134,13 @@ class Snake(GameObject):
             rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, self.body_color, rect)
             pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+
         if self.last is not None:
             last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
-            pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
+            pygame.draw.rect(
+                screen, BOARD_BACKGROUND_COLOR, last_rect
+            )
             self.last = None
-
 
 def handle_keys(game_object):
     """Обработать закрытие окна и нажатия клавиш."""
@@ -145,8 +148,10 @@ def handle_keys(game_object):
         if event.type == pygame.QUIT:
             pygame.quit()
             raise SystemExit
+
         if event.type != pygame.KEYDOWN:
             continue
+
         if event.key == pygame.K_ESCAPE:
             pygame.quit()
             raise SystemExit
@@ -158,6 +163,7 @@ def handle_keys(game_object):
             pygame.K_RIGHT: RIGHT,
         }
         new_direction = directions.get(event.key)
+
         if new_direction is not None:
             reverse_directions = {
                 UP: DOWN,
@@ -165,12 +171,12 @@ def handle_keys(game_object):
                 LEFT: RIGHT,
                 RIGHT: LEFT,
             }
-            current_direction = getattr(
-                game_object, 'next_direction', None
-            ) or game_object.direction
+            current_direction = (
+                getattr(game_object, 'next_direction', None)
+                or game_object.direction
+            )
             if new_direction != reverse_directions[current_direction]:
                 game_object.next_direction = new_direction
-
 
 def main():
     """Запустить игровой цикл."""
@@ -187,6 +193,7 @@ def main():
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position()
+
             while apple.position in snake.positions:
                 apple.randomize_position()
 
@@ -194,7 +201,6 @@ def main():
         apple.draw()
         snake.draw()
         pygame.display.update()
-
 
 if __name__ == '__main__':
     main()
